@@ -11,15 +11,15 @@ src/template.html            the viewer page (markup, styles, script); data is f
 build.py                     reads every unified.json and writes dist/index.html (standard library only)
 .github/workflows/build.yml  nightly build + deploy to GitHub Pages
 ```
+#
+ ## Setup (once)
 
-## Setup (once)
+#1. Create a new repo (for example `matc-ems/scenario-viewer`) and push these files to `main`.
+#2. In the repo, open **Settings → Pages** and set **Source** to **GitHub Actions**.
+#3. Open the **Actions** tab, choose **Build and publish viewer**, and click **Run workflow**.
+#4. When it finishes, the viewer is live at `https://<owner>.github.io/<repo>/` (for example `https://matc-ems.github.io/scenario-viewer/`).
 
-1. Create a new repo (for example `matc-ems/scenario-viewer`) and push these files to `main`.
-2. In the repo, open **Settings → Pages** and set **Source** to **GitHub Actions**.
-3. Open the **Actions** tab, choose **Build and publish viewer**, and click **Run workflow**.
-4. When it finishes, the viewer is live at `https://<owner>.github.io/<repo>/` (for example `https://matc-ems.github.io/scenario-viewer/`).
-
-The scenarios repo must be public for the Action to read it without extra credentials. If it becomes private, add a token with read access as a secret and pass it to the second `actions/checkout` step as `token: ${{ secrets.SCENARIOS_TOKEN }}`.
+#The scenarios repo must be public for the Action to read it without extra credentials. If it becomes private, add a token with read access as a secret and pass it to the second `actions/checkout` step as `token: ${{ secrets.SCENARIOS_TOKEN }}`.
 
 ## When it updates
 
