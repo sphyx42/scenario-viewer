@@ -1,0 +1,65 @@
+name: Build and publish viewer
+
+on:
+  schedule:
+    - cron: "17 7 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+  repository_dispatch:
+    types: [scenarios-updated]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+env:
+  SCENARIOS_REPO: matc-ems/scenarios
+  SCENARIOS_BRANCH: main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out viewer
+        uses: actions/checkout@v4
+
+      - name: Check out scenarios
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.SCENARIOS_REPO }}
+          ref: ${{ env.SCENARIOS_BRANCH }}
+          path: _scenarios
+          sparse-checkout: |
+            sim-lab/*/unified.json
+            main-lab/*/unified.json
+          sparse-checkout-cone-mode: false
+
+      - name: Build page
+        run: |
+          python3 build.py \
+            --scenarios _scenarios \
+            --out dist/index.html \
+            --repo "$SCENARIOS_REPO" \
+            --branch "$SCENARIOS_BRANCH" \
+            --pages-url "${{ vars.SCENARIOS_PAGES_URL }}"
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
